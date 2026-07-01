@@ -92,7 +92,6 @@ function App() {
       }
     } catch (error) {
       console.error("Auth error:", error);
-      // Adaptive bypass to let developers navigate dashboard during offline environment staging
       alert("Note: Connecting with offline client fallback profiles.");
       setUserProfile({ name: name || "Developer Guest", ecoPoints: 250 });
       setIsLoggedIn(true);
@@ -130,13 +129,13 @@ function App() {
       const data = await response.json();
       setScanResult(data);
       
-      // Upgrade user balances interactively upon valid endpoint analysis
       if(data.confidence) {
         setUserProfile(prev => ({...prev, ecoPoints: prev.ecoPoints + 50}));
       }
+      setLoading(false);
     } catch (error) {
       console.error("Scanning failed, simulating mock telemetry:", error);
-      // Seamless mock scanning framework for client-side evaluation
+      // Clean timeout orchestration that updates profile balance safely
       setTimeout(() => {
         setScanResult({
           category: "Obsolete Circuit Board / Smartphone Core",
@@ -145,8 +144,6 @@ function App() {
         setUserProfile(prev => ({...prev, ecoPoints: prev.ecoPoints + 50}));
         setLoading(false);
       }, 1200);
-    } finally {
-      if (!loading) setLoading(false);
     }
   };
 

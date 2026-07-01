@@ -31,6 +31,11 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("🎉 Connected to MongoDB Atlas successfully!"))
   .catch((err) => console.error("❌ Database connection error:", err));
 
+// 🚀 Root Test Route (Verifies deployment connectivity instantly)
+app.get('/', (req, res) => {
+  res.json({ status: "online", service: "EcoClean E-Waste Backend Matrix" });
+});
+
 // 1. Fetch all bins currently in the database
 app.get('/api/bins', async (req, res) => {
   try {
@@ -170,6 +175,7 @@ app.post('/api/recycle/scan', upload.single('image'), async (req, res) => {
     });
 
     // 🛠️ Note: Ensure your Python model server environment is live during scanning operations
+    // Replace 'http://localhost:8000' with your live Python server URL when deployed
     const pythonAIResponse = await axios.post('http://localhost:8000/api/classify', form, {
       headers: { ...form.getHeaders() }
     });
@@ -188,6 +194,16 @@ app.post('/api/recycle/scan', upload.single('image'), async (req, res) => {
     console.error("❌ Bridge Error:", error.message);
     res.status(500).json({ error: "Failed to communicate with AI model processing server." });
   }
+});
+
+// ⚠️ Global Catch-All Fallback Route
+// Prevents default HTML 404 sheets and ensures trailing slashes return structural JSON
+app.use((req, res) => {
+  console.log(`⚠️ Unmatched request intercepted: ${req.method} ${req.url}`);
+  res.status(404).json({ 
+    success: false, 
+    error: `Route ${req.url} matches no operational endpoint within this backend application.` 
+  });
 });
 
 // Boot up server listener

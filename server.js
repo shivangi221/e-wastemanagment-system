@@ -15,8 +15,12 @@ const Transaction = require('./models/Transaction');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS and JSON body processing
-app.use(cors()); 
+// 🛠️ Modified: Configured dynamic production CORS alignment rules
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  credentials: true
+})); 
+
 app.use(express.json());
 
 // Configure Multer to temporarily hold uploaded files in memory
@@ -165,6 +169,7 @@ app.post('/api/recycle/scan', upload.single('image'), async (req, res) => {
       contentType: req.file.mimetype,
     });
 
+    // 🛠️ Note: Ensure your Python model server environment is live during scanning operations
     const pythonAIResponse = await axios.post('http://localhost:8000/api/classify', form, {
       headers: { ...form.getHeaders() }
     });
@@ -187,5 +192,5 @@ app.post('/api/recycle/scan', upload.single('image'), async (req, res) => {
 
 // Boot up server listener
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

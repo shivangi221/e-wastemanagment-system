@@ -1,6 +1,9 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
 
+// 🛠️ Added: Dynamic API base routing layout for local and cloud deployment setups
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+
 function App() {
   // Authentication States
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -30,10 +33,10 @@ function App() {
     { name: "📍 Delhi NCR Matrix", lat: "28.6139", lng: "77.2090" }
   ];
 
-  // 🛠️ Fixed to use 127.0.0.1 loopback for bulletproof routing
+  // 🛠️ Updated: Uses the production-aligned variable for safe cloud syncing
   useEffect(() => {
     if (isLoggedIn) {
-      fetch('http://127.0.0.1:5000/api/bins')
+      fetch(`${API_BASE_URL}/api/bins`)
         .then((res) => res.json())
         .then((data) => {
           if (Array.isArray(data)) setBins(data);
@@ -42,7 +45,7 @@ function App() {
     }
   }, [isLoggedIn]);
 
-  // 🛠️ Fixed to use 127.0.0.1 loopback
+  // 🛠️ Updated: Replaced loopback strings with dynamic routing templates
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     
@@ -54,7 +57,7 @@ function App() {
     const payload = isRegisterMode ? { name, email, password } : { email, password };
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -95,7 +98,7 @@ function App() {
     });
   };
 
-  // 🛠️ Fixed: Changed 'loading(true)' to 'setLoading(true)' and used 127.0.0.1
+  // 🛠️ Updated: Swapped localized base addresses with the global route reference
   const handleUploadAndScan = async () => {
     if (!selectedFile) return alert("Please select an image file first!");
     setLoading(true); 
@@ -103,7 +106,7 @@ function App() {
     formData.append('image', selectedFile);
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/recycle/scan', {
+      const response = await fetch(`${API_BASE_URL}/api/recycle/scan`, {
         method: 'POST',
         body: formData,
       });
